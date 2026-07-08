@@ -1,0 +1,1 @@
+print(f"Iteration {i}: Cost {cost:.4f}, Weight {[f'{w:.4f}' for w in self.w]}, Bias {self.b:.4f}")

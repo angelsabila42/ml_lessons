@@ -1,0 +1,1 @@
+Weight {[f'{w:.4f}' for w in self.w]}

@@ -1,58 +1,53 @@
 import numpy as np
 
-def predict (x, w, b):
-    """
-    Predicts the output of a linear regression model given input features, weights, and bias.
+class LinearRegression:
+    def __init__(self,learning_rate = 0.01, iterations = 1000):
+        self.learning_rate = learning_rate
+        self.iterations = iterations
+        
+    
+    def predict (self, X):
+        return X @ self.w + self.b
 
-    Parameters:
-    x (numpy.ndarray): Input features, shape (n_samples, n_features).
-    w (numpy.ndarray): Weights of the model, shape (n_features,).
-    b (float): Bias term.
+    def loss(self, y_true, y_pred):
+        """
+        Computes the Mean Squared Error (MSE) loss between true and predicted values.
 
-    Returns:
-    numpy.ndarray: Predicted output, shape (n_samples,).
-    """
-    return x * w + b
+        Parameters:
+        y_true (numpy.ndarray): True output values, shape (n_samples,).
+        y_pred (numpy.ndarray): Predicted output values, shape (n_samples,).
 
-def loss(y_true, y_pred):
-    """
-    Computes the Mean Squared Error (MSE) loss between true and predicted values.
+        Returns:
+        float: Mean Squared Error loss.
+        """
+        return np.mean((y_true - y_pred) ** 2)
+    
+    def fit(self, X, y):
+        n_samples, n_features = X.shape
+        self.w = np.zeros(n_features)
+        self.b = 0
+        
+        for i in range (self.iterations):
+            #Make predictions
+            y_pred = self.predict(X)
+            
+            #Calculate loss
+            cost = self.loss(y, y_pred)
+        
+            #Calculate gradients
+            dw = (2/n_samples) * X.T @ (y_pred - y)
+            db = (2/n_samples) * np.sum(y_pred - y) 
 
-    Parameters:
-    y_true (numpy.ndarray): True output values, shape (n_samples,).
-    y_pred (numpy.ndarray): Predicted output values, shape (n_samples,).
+            #Update weights and bias
+            self.w = self.w - self.learning_rate * dw
+            self.b = self.b - self.learning_rate * db
+            
+            if i % 100 == 0:
+                print(f"Iteration {i}: Cost {cost:.4f}, Weight {[f'{w:.4f}' for w in self.w]}, Bias {self.b:.4f}")
+        
 
-    Returns:
-    float: Mean Squared Error loss.
-    """
-    return np.mean((y_true - y_pred) ** 2)
-
-x = np.array([1, 2, 3, 4, 5], dtype=float)
+X = np.array([[1], [2], [3], [4], [5]], dtype=float)
 y = np.array([3, 5, 7, 9, 11], dtype=float)
 
-w = 0
-b = 0
-
-learning_rate = 0.01
-iterations = 1000
-
-for i in range (iterations):
-    #Make predictions and calculate loss
-    predictions = predict(x,w,b)
-    cost = loss(y, predictions)
-    
-    n = len(x)
-
-    #Calculate gradients
-    dw = (2/n) * np.sum((predictions - y) * x)
-    db = (2/n) * np.sum(predictions - y) 
-
-    #Update weights and bias
-    w = w - learning_rate * dw
-    b = b - learning_rate * db
-    
-    if i % 100 == 0:
-        print(f"Iteration {i}: Cost {cost:.4f}, Weight {w:.4f}, Bias {b:.4f}")
-   
-print(f"\nFinal weight = {w:.4f}")
-print(f"Final intercept = {b:.4f}")
+model = LinearRegression()
+model.fit(X, y)
